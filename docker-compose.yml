@@ -1,0 +1,30 @@
+services:
+  frontend:
+    image: frontend:latest
+    container_name: frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=${API_URL}
+      - NEXT_PUBLIC_GRAFANA_URL=${GRAFANA_URL}
+    restart: always
+
+  api:
+    image: api:latest
+    container_name: api
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3001"
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - ELASTIC_SEARCH_USERNAME=${ELASTIC_SEARCH_USERNAME}
+      - ELASTIC_SEARCH_PASSWORD=${ELASTIC_SEARCH_PASSWORD}
+      - ELASTIC_SEARCH_URL=${ELASTIC_SEARCH_URL}
+      - CORS_ORIGINS=${FRONTEND_URL}
+    restart: always
