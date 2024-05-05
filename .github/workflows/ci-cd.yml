@@ -10,11 +10,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # - name: Setup SSH Agent
-      #   uses: webfactory/ssh-agent@v0.5.3
-      #   with:
-      #     ssh-private-key: ${{ secrets.SSH_REPO_PRIVATE_KEY }}
-
       - name: Deploy to Dev Server
         if: github.ref == 'refs/heads/dev'
         uses: appleboy/ssh-action@master
