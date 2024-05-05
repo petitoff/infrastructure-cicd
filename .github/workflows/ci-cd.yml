@@ -1,0 +1,46 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: |
+            ${{ secrets.SSH_REPO_PRIVATE_KEY }}
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to Dev Server
+        if: github.ref == 'refs/heads/dev'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEV_SSH_HOST }}
+          username: ${{ secrets.DEV_SSH_USERNAME }}
+          key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/progtom
+            git pull origin dev
+            docker-compose down
+            docker-compose build
+            docker-compose up -d
+      - name: Deploy to Main Server
+        if: github.ref == 'refs/heads/main'
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.MAIN_SSH_HOST }}
+          username: ${{ secrets.MAIN_SSH_USERNAME }}
+          key: ${{ secrets.MAIN_SSH_PRIVATE_KEY }}
+          script: |
+            cd /path/to/your/main/project
+            git pull origin main
+            docker compose down
+            docker compose build
+            docker compose up -d
