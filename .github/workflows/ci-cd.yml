@@ -10,21 +10,21 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.5.3
+      # - name: Setup SSH Agent
+      #   uses: webfactory/ssh-agent@v0.5.3
+      #   with:
+      #     ssh-private-key: ${{ secrets.SSH_REPO_PRIVATE_KEY }}
+
+      - name: Deploy to Dev Server
+        if: github.ref == 'refs/heads/dev'
+        uses: appleboy/ssh-action@master
         with:
-          ssh-private-key: ${{ secrets.SSH_REPO_PRIVATE_KEY }}
-
-      - name: Set up working directory
-        run: cd /home/ubuntu/infrastructure-cicd
-
-      - name: Pull latest changes from Git
-        run: |
-          git config --global url."git@github.com:".insteadOf "https://github.com/"
-          git pull origin dev
-
-      - name: Docker Compose Down and Up
-        run: |
-          docker-compose down
-          docker-compose build
-          docker-compose up -d
+          host: ${{ secrets.DEV_SSH_HOST }}
+          username: ${{ secrets.DEV_SSH_USERNAME }}
+          key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/infrastructure-cicd
+            git pull origin dev
+            docker-compose down
+            docker-compose build
+            docker-compose up -d
