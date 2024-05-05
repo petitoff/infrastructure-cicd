@@ -13,10 +13,7 @@ jobs:
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: |
-            ${{ secrets.SSH_REPO_PRIVATE_KEY }}
-      - name: Checkout code
-        uses: actions/checkout@v2
+          ssh-private-key: ${{ secrets.SSH_REPO_PRIVATE_KEY }}
 
       - name: Deploy to Dev Server
         if: github.ref == 'refs/heads/dev'
@@ -26,7 +23,7 @@ jobs:
           username: ${{ secrets.DEV_SSH_USERNAME }}
           key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/progtom
+            cd /home/ubuntu/infrastructure-cicd
             git pull origin dev
             docker-compose down
             docker-compose build
