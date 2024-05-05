@@ -15,29 +15,16 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_REPO_PRIVATE_KEY }}
 
-      - name: Deploy to Dev Server
-        if: github.ref == 'refs/heads/dev'
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.DEV_SSH_HOST }}
-          username: ${{ secrets.DEV_SSH_USERNAME }}
-          key: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
-          script: |
-            cd /home/ubuntu/infrastructure-cicd
-            git pull origin dev
-            docker-compose down
-            docker-compose build
-            docker-compose up -d
-      - name: Deploy to Main Server
-        if: github.ref == 'refs/heads/main'
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.MAIN_SSH_HOST }}
-          username: ${{ secrets.MAIN_SSH_USERNAME }}
-          key: ${{ secrets.MAIN_SSH_PRIVATE_KEY }}
-          script: |
-            cd /path/to/your/main/project
-            git pull origin main
-            docker compose down
-            docker compose build
-            docker compose up -d
+      - name: Set up working directory
+        run: cd /home/ubuntu/infrastructure-cicd
+
+      - name: Pull latest changes from Git
+        run: |
+          git config --global url."git@github.com:".insteadOf "https://github.com/"
+          git pull origin dev
+
+      - name: Docker Compose Down and Up
+        run: |
+          docker-compose down
+          docker-compose build
+          docker-compose up -d
